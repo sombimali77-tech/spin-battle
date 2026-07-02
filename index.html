@@ -2,83 +2,54 @@
 <html>
 <head>
     <style>
-        /* This sets the background image for the whole stream */
-        body { 
-            background-image: url('background.jpg'); 
-            background-size: cover;
-            background-position: center;
-            font-family: sans-serif; 
-            text-align: center;
-            color: white; /* Makes text visible over the background */
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-        }
-
-        #wheel { 
-            width: 300px; height: 300px; 
-            border-radius: 50%; 
-            border: 10px solid #fff;
-            background: conic-gradient(red 0deg 180deg, yellow 180deg 360deg);
-            transition: transform 5s cubic-bezier(0.17, 0.67, 0.12, 0.99); 
-        }
-
-        .arrow { 
-            width: 0; height: 0; 
-            border-left: 20px solid transparent; 
-            border-right: 20px solid transparent;
-            border-top: 40px solid white; 
-            margin-bottom: -10px; 
-        }
+        body { margin: 0; height: 100vh; display: flex; flex-direction: column; 
+               align-items: center; justify-content: center;
+               background: url('background.jpg') no-repeat center center/cover; 
+               color: white; font-family: sans-serif; text-align: center; }
+        
+        #wheel { width: 350px; height: 350px; border-radius: 50%; border: 10px solid white; 
+                 overflow: hidden; box-shadow: 0 0 20px black; transition: transform 30s cubic-bezier(0.1, 0.7, 0.1, 1); }
+        
+        .img-seg { width: 100%; height: 50%; object-fit: cover; display: block; }
+        .score-board { margin-top: 30px; padding: 20px; background: rgba(0,0,0,0.8); 
+                       border-radius: 20px; font-size: 30px; border: 3px solid white; }
     </style>
 </head>
 <body>
-    <div class="arrow"></div>
-    <div id="wheel"></div>
-    
-    <h2>Ronaldo: <span id="redCount">0</span> | Messi: <span id="yellowCount">0</span></h2>
-    
-    <img id="winnerImg" src="" style="display:none; width:200px; border: 5px solid gold; margin-top:10px;">
-
-    <audio id="spinAudio" src="spin.mp3"></audio>
-    <audio id="winAudio" src="win.mp3"></audio>
+    <div id="wheel">
+        <img src="ronaldo.jpg" class="img-seg">
+        <img src="messi.jpg" class="img-seg">
+    </div>
+    <div class="score-board">
+        RONALDO: <span id="r">0</span> | MESSI: <span id="m">0</span>
+    </div>
+    <audio id="s-spin" src="spin.mp3"></audio>
+    <audio id="s-win" src="win.mp3"></audio>
 
     <script>
-        let red = 0, yellow = 0;
+        let r=0, m=0, deg=0;
+        const w = document.getElementById('wheel');
+        const sSpin = document.getElementById('s-spin');
+        const sWin = document.getElementById('s-win');
 
-        function spin() {
-            document.getElementById('spinAudio').play();
-            let rotation = Math.ceil(Math.random() * 1000) + 2000;
-            document.getElementById('wheel').style.transform = `rotate(${rotation}deg)`;
-            
-            setTimeout(() => {
-                document.getElementById('winAudio').play();
-                let finalDeg = rotation % 360;
-                let img = document.getElementById('winnerImg');
-                
-                if(finalDeg < 180) { 
-                    red++; 
-                    document.getElementById('redCount').innerText = red;
-                    img.src = 'ronaldo.jpg'; 
-                } else { 
-                    yellow++; 
-                    document.getElementById('yellowCount').innerText = yellow;
-                    img.src = 'messi.jpg'; 
-                }
-                
-                img.style.display = 'block';
-
-                setTimeout(() => {
-                    img.style.display = 'none';
-                    spin();
-                }, 10000); 
-            }, 5000); 
+        function startSpin() {
+            deg += 3600 + Math.floor(Math.random() * 360);
+            w.style.transform = `rotate(${deg}deg)`;
+            sSpin.play();
         }
-        
-        spin();
+
+        // This triggers ONLY when the rotation transition finishes
+        w.addEventListener('transitionend', () => {
+            sSpin.pause();
+            sSpin.currentTime = 0;
+            sWin.play();
+            
+            let final = (deg % 360);
+            if(final < 180) { r++; document.getElementById('r').innerText = r; }
+            else { m++; document.getElementById('m').innerText = m; }
+        });
+
+        document.body.onclick = () => { startSpin(); };
     </script>
 </body>
 </html>
