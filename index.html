@@ -1,55 +1,30 @@
-<!DOCTYPE html>
-<html>
 <head>
     <style>
-        body { margin: 0; height: 100vh; display: flex; flex-direction: column; 
-               align-items: center; justify-content: center;
-               background: url('background.jpg') no-repeat center center/cover; 
-               color: white; font-family: sans-serif; text-align: center; }
-        
-        #wheel { width: 350px; height: 350px; border-radius: 50%; border: 10px solid white; 
-                 overflow: hidden; box-shadow: 0 0 20px black; transition: transform 30s cubic-bezier(0.1, 0.7, 0.1, 1); }
-        
-        .img-seg { width: 100%; height: 50%; object-fit: cover; display: block; }
-        .score-board { margin-top: 30px; padding: 20px; background: rgba(0,0,0,0.8); 
-                       border-radius: 20px; font-size: 30px; border: 3px solid white; }
+        /* Add this to your existing <style> block */
+        .arrow-indicator {
+            width: 0; 
+            height: 0; 
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid #ff0000; /* Bright red arrow */
+            position: absolute;
+            top: -50px; /* Positions it just above the wheel */
+            z-index: 20;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
+        }
+
+        #wheel-wrapper {
+            position: relative; /* This holds the arrow in place */
+            margin-top: 50px;
+        }
     </style>
 </head>
 <body>
-    <div id="wheel">
-        <img src="ronaldo.jpg" class="img-seg">
-        <img src="messi.jpg" class="img-seg">
+    <div id="wheel-wrapper">
+        <div class="arrow-indicator"></div> 
+        <div id="wheel">
+            <img src="ronaldo.jpg" class="img-seg">
+            <img src="messi.jpg" class="img-seg">
+        </div>
     </div>
-    <div class="score-board">
-        RONALDO: <span id="r">0</span> | MESSI: <span id="m">0</span>
-    </div>
-    <audio id="s-spin" src="spin.mp3"></audio>
-    <audio id="s-win" src="win.mp3"></audio>
-
-    <script>
-        let r=0, m=0, deg=0;
-        const w = document.getElementById('wheel');
-        const sSpin = document.getElementById('s-spin');
-        const sWin = document.getElementById('s-win');
-
-        function startSpin() {
-            deg += 3600 + Math.floor(Math.random() * 360);
-            w.style.transform = `rotate(${deg}deg)`;
-            sSpin.play();
-        }
-
-        // This triggers ONLY when the rotation transition finishes
-        w.addEventListener('transitionend', () => {
-            sSpin.pause();
-            sSpin.currentTime = 0;
-            sWin.play();
-            
-            let final = (deg % 360);
-            if(final < 180) { r++; document.getElementById('r').innerText = r; }
-            else { m++; document.getElementById('m').innerText = m; }
-        });
-
-        document.body.onclick = () => { startSpin(); };
-    </script>
-</body>
-</html>
+    </body>
