@@ -1,30 +1,65 @@
+<!DOCTYPE html>
+<html>
 <head>
     <style>
-        /* Add this to your existing <style> block */
-        .arrow-indicator {
-            width: 0; 
-            height: 0; 
-            border-left: 20px solid transparent;
-            border-right: 20px solid transparent;
-            border-top: 40px solid #ff0000; /* Bright red arrow */
-            position: absolute;
-            top: -50px; /* Positions it just above the wheel */
-            z-index: 20;
-            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
+        body { 
+            margin: 0; height: 100vh; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; background: #222;
+            color: white; font-family: sans-serif;
         }
-
-        #wheel-wrapper {
-            position: relative; /* This holds the arrow in place */
-            margin-top: 50px;
+        /* The Red Arrow */
+        .arrow {
+            width: 0; height: 0; border-left: 20px solid transparent;
+            border-right: 20px solid transparent; border-top: 40px solid red;
+            margin-bottom: 10px;
         }
+        /* The Circle Wheel */
+        #wheel { 
+            width: 300px; height: 300px; border-radius: 50%; border: 10px solid white; 
+            overflow: hidden; position: relative; transition: transform 30s cubic-bezier(0.1, 0.7, 0.1, 1);
+        }
+        /* The two halves */
+        .img-seg { width: 300px; height: 150px; object-fit: cover; display: block; }
+        
+        .score-board { margin-top: 30px; padding: 20px; background: #000; 
+                       border-radius: 10px; font-size: 24px; border: 2px solid white; }
     </style>
 </head>
 <body>
-    <div id="wheel-wrapper">
-        <div class="arrow-indicator"></div> 
-        <div id="wheel">
-            <img src="ronaldo.jpg" class="img-seg">
-            <img src="messi.jpg" class="img-seg">
-        </div>
+    <div class="arrow"></div>
+    <div id="wheel">
+        <img src="ronaldo.jpg" class="img-seg">
+        <img src="messi.jpg" class="img-seg">
     </div>
-    </body>
+    <div class="score-board">
+        RONALDO: <span id="r">0</span> | MESSI: <span id="m">0</span>
+    </div>
+
+    <audio id="s-spin" src="spin.mp3"></audio>
+    <audio id="s-win" src="win.mp3"></audio>
+
+    <script>
+        let r=0, m=0, deg=0;
+        const w = document.getElementById('wheel');
+        const sSpin = document.getElementById('s-spin');
+        const sWin = document.getElementById('s-win');
+
+        function spin() {
+            deg += 3600 + Math.floor(Math.random() * 360);
+            w.style.transform = `rotate(${deg}deg)`;
+            sSpin.play();
+        }
+
+        w.addEventListener('transitionend', () => {
+            sSpin.pause(); sSpin.currentTime = 0;
+            sWin.play();
+            // 0-180 is bottom half (Messi), 180-360 is top half (Ronaldo)
+            let final = (deg % 360);
+            if(final > 180) { r++; document.getElementById('r').innerText = r; }
+            else { m++; document.getElementById('m').innerText = m; }
+        });
+
+        document.body.onclick = () => { spin(); };
+    </script>
+</body>
+</html>
