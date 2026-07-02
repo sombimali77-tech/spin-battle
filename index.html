@@ -4,24 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: sans-serif; background: #1a1a1a; color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; min-height: 100vh; }
+        body { font-family: sans-serif; background: #1a1a1a; color: white; display: flex; flex-direction: column; align-items: center; padding: 10px; margin: 0; min-height: 100vh; }
         
-        /* Match Table - Smaller */
-        #match-container { width: 100%; max-width: 300px; background: #252525; padding: 8px; border-radius: 8px; margin-bottom: 15px; }
-        .match-row { display: flex; justify-content: space-between; border-bottom: 1px solid #444; padding: 4px 0; font-size: 12px; }
+        /* Match Table */
+        #match-container { width: 100%; max-width: 400px; background: #252525; padding: 10px; border-radius: 8px; margin-bottom: 15px; }
+        .match-row { display: flex; justify-content: space-between; border-bottom: 1px solid #444; padding: 5px 0; font-size: 14px; }
         
-        /* Wheel - Responsive Size */
-        .wheel-wrapper { position: relative; width: 40vw; height: 40vw; max-width: 180px; max-height: 180px; margin: 20px 0; }
-        #wheel { width: 100%; height: 100%; border-radius: 50%; border: 6px solid #ffd700; background: conic-gradient(#ff4d4d 0deg 180deg, #4d94ff 180deg 360deg); transition: transform 30s cubic-bezier(0.15, 0, 0, 1); }
-        .pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); color: #ffd700; font-size: 20px; }
+        /* Wheel */
+        .wheel-wrapper { position: relative; width: 200px; height: 200px; margin: 20px 0; }
+        #wheel { width: 100%; height: 100%; border-radius: 50%; border: 8px solid #ffd700; background: conic-gradient(#ff4d4d 0deg 180deg, #4d94ff 180deg 360deg); transition: transform 30s cubic-bezier(0.15, 0, 0, 1); }
+        .pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); color: #ffd700; font-size: 24px; }
         
-        /* Scoreboard - Smaller */
-        #scoreboard { font-size: 14px; margin-bottom: 15px; }
-        .controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 20px; }
-        button { padding: 8px 12px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; font-size: 12px; }
+        /* Score & Controls */
+        #scoreboard { font-size: 16px; margin-bottom: 10px; }
+        .controls { display: flex; gap: 10px; margin-bottom: 20px; }
+        button { padding: 10px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; }
         
+        /* Winner Display */
         #winner-box { display: none; flex-direction: column; align-items: center; margin-top: 10px; }
-        #winner-img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #ffd700; }
+        #winner-img { width: 100px; height: 100px; border-radius: 50%; border: 3px solid #ffd700; }
     </style>
 </head>
 <body>
@@ -41,9 +42,9 @@
     <div class="controls">
         <button onclick="announceWinner('Ronaldo')" style="background:#ff4d4d">Ronaldo</button>
         <button onclick="announceWinner('Messi')" style="background:#4d94ff">Messi</button>
-        <button onclick="playSound('star-sound')" style="background:#ffd700">⭐ Star</button>
+        <button onclick="document.getElementById('star-sound').play()" style="background:#ffd700">⭐ Star</button>
         <button onclick="spin()" style="background:#444">Spin</button>
-        <button onclick="playSound('custom-sound')" style="background:#888">Custom</button>
+        <button onclick="document.getElementById('custom-sound').play()" style="background:#888">Custom</button>
     </div>
 
     <div id="winner-box">
@@ -62,11 +63,10 @@
         function spin() {
             const wheel = document.getElementById('wheel');
             document.getElementById('spin-sound').play();
-            // Reset rotation to allow re-spinning
+            // Reset transition and position for new spin
             wheel.style.transition = 'none';
             wheel.style.transform = 'rotate(0deg)';
             
-            // Force reflow
             setTimeout(() => {
                 wheel.style.transition = 'transform 30s cubic-bezier(0.15, 0, 0, 1)';
                 wheel.style.transform = `rotate(${Math.floor(Math.random() * 5000) + 3000}deg)`;
@@ -78,10 +78,6 @@
             document.getElementById('winner-img').src = images[winner];
             document.getElementById('winner-box').style.display = 'flex';
             document.getElementById('win-sound').play();
-        }
-
-        function playSound(id) {
-            document.getElementById(id).play();
         }
     </script>
 </body>
