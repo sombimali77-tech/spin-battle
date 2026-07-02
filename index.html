@@ -1,65 +1,88 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { 
-            margin: 0; height: 100vh; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; background: #222;
-            color: white; font-family: sans-serif;
-        }
-        /* The Red Arrow */
-        .arrow {
-            width: 0; height: 0; border-left: 20px solid transparent;
-            border-right: 20px solid transparent; border-top: 40px solid red;
-            margin-bottom: 10px;
-        }
-        /* The Circle Wheel */
-        #wheel { 
-            width: 300px; height: 300px; border-radius: 50%; border: 10px solid white; 
-            overflow: hidden; position: relative; transition: transform 30s cubic-bezier(0.1, 0.7, 0.1, 1);
-        }
-        /* The two halves */
-        .img-seg { width: 300px; height: 150px; object-fit: cover; display: block; }
+        body { font-family: sans-serif; background: #1a1a1a; color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; min-height: 100vh; }
         
-        .score-board { margin-top: 30px; padding: 20px; background: #000; 
-                       border-radius: 10px; font-size: 24px; border: 2px solid white; }
+        /* Match Table - Smaller */
+        #match-container { width: 100%; max-width: 300px; background: #252525; padding: 8px; border-radius: 8px; margin-bottom: 15px; }
+        .match-row { display: flex; justify-content: space-between; border-bottom: 1px solid #444; padding: 4px 0; font-size: 12px; }
+        
+        /* Wheel - Responsive Size */
+        .wheel-wrapper { position: relative; width: 40vw; height: 40vw; max-width: 180px; max-height: 180px; margin: 20px 0; }
+        #wheel { width: 100%; height: 100%; border-radius: 50%; border: 6px solid #ffd700; background: conic-gradient(#ff4d4d 0deg 180deg, #4d94ff 180deg 360deg); transition: transform 30s cubic-bezier(0.15, 0, 0, 1); }
+        .pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); color: #ffd700; font-size: 20px; }
+        
+        /* Scoreboard - Smaller */
+        #scoreboard { font-size: 14px; margin-bottom: 15px; }
+        .controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 20px; }
+        button { padding: 8px 12px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; font-size: 12px; }
+        
+        #winner-box { display: none; flex-direction: column; align-items: center; margin-top: 10px; }
+        #winner-img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #ffd700; }
     </style>
 </head>
 <body>
-    <div class="arrow"></div>
-    <div id="wheel">
-        <img src="ronaldo.jpg" class="img-seg">
-        <img src="messi.jpg" class="img-seg">
-    </div>
-    <div class="score-board">
-        RONALDO: <span id="r">0</span> | MESSI: <span id="m">0</span>
+
+    <div id="match-container">
+        <div class="match-row"><span>Spain vs Austria</span><span>15:00 (NPT)</span></div>
+        <div class="match-row"><span>Portugal vs Croatia</span><span>19:00 (NPT)</span></div>
     </div>
 
-    <audio id="s-spin" src="spin.mp3"></audio>
-    <audio id="s-win" src="win.mp3"></audio>
+    <div id="scoreboard">Ronaldo: <span id="score-Ronaldo">0</span> | Messi: <span id="score-Messi">0</span></div>
+
+    <div class="wheel-wrapper">
+        <div class="pointer">▼</div>
+        <div id="wheel"></div>
+    </div>
+
+    <div class="controls">
+        <button onclick="announceWinner('Ronaldo')" style="background:#ff4d4d">Ronaldo</button>
+        <button onclick="announceWinner('Messi')" style="background:#4d94ff">Messi</button>
+        <button onclick="playSound('star-sound')" style="background:#ffd700">⭐ Star</button>
+        <button onclick="spin()" style="background:#444">Spin</button>
+        <button onclick="playSound('custom-sound')" style="background:#888">Custom</button>
+    </div>
+
+    <div id="winner-box">
+        <img id="winner-img" src="" alt="Winner">
+        <h3>WINNER!</h3>
+    </div>
+
+    <audio id="win-sound" src="win.mp3"></audio>
+    <audio id="star-sound" src="star.mp3"></audio>
+    <audio id="spin-sound" src="spin.mp3"></audio>
+    <audio id="custom-sound" src="YOUR_CUSTOM_FILE.mp3"></audio>
 
     <script>
-        let r=0, m=0, deg=0;
-        const w = document.getElementById('wheel');
-        const sSpin = document.getElementById('s-spin');
-        const sWin = document.getElementById('s-win');
-
+        const images = { Ronaldo: "ronaldo.jpg", Messi: "messi.jpg" };
+        
         function spin() {
-            deg += 3600 + Math.floor(Math.random() * 360);
-            w.style.transform = `rotate(${deg}deg)`;
-            sSpin.play();
+            const wheel = document.getElementById('wheel');
+            document.getElementById('spin-sound').play();
+            // Reset rotation to allow re-spinning
+            wheel.style.transition = 'none';
+            wheel.style.transform = 'rotate(0deg)';
+            
+            // Force reflow
+            setTimeout(() => {
+                wheel.style.transition = 'transform 30s cubic-bezier(0.15, 0, 0, 1)';
+                wheel.style.transform = `rotate(${Math.floor(Math.random() * 5000) + 3000}deg)`;
+            }, 50);
         }
 
-        w.addEventListener('transitionend', () => {
-            sSpin.pause(); sSpin.currentTime = 0;
-            sWin.play();
-            // 0-180 is bottom half (Messi), 180-360 is top half (Ronaldo)
-            let final = (deg % 360);
-            if(final > 180) { r++; document.getElementById('r').innerText = r; }
-            else { m++; document.getElementById('m').innerText = m; }
-        });
+        function announceWinner(winner) {
+            document.getElementById('score-' + winner).innerText = parseInt(document.getElementById('score-' + winner).innerText) + 1;
+            document.getElementById('winner-img').src = images[winner];
+            document.getElementById('winner-box').style.display = 'flex';
+            document.getElementById('win-sound').play();
+        }
 
-        document.body.onclick = () => { spin(); };
+        function playSound(id) {
+            document.getElementById(id).play();
+        }
     </script>
 </body>
 </html>
