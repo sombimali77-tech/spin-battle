@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* This sets the background image for the whole stream */
+        body { 
+            background-image: url('background.jpg'); 
+            background-size: cover;
+            background-position: center;
+            font-family: sans-serif; 
+            text-align: center;
+            color: white; /* Makes text visible over the background */
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #wheel { 
+            width: 300px; height: 300px; 
+            border-radius: 50%; 
+            border: 10px solid #fff;
+            background: conic-gradient(red 0deg 180deg, yellow 180deg 360deg);
+            transition: transform 5s cubic-bezier(0.17, 0.67, 0.12, 0.99); 
+        }
+
+        .arrow { 
+            width: 0; height: 0; 
+            border-left: 20px solid transparent; 
+            border-right: 20px solid transparent;
+            border-top: 40px solid white; 
+            margin-bottom: -10px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="arrow"></div>
+    <div id="wheel"></div>
+    
+    <h2>Ronaldo: <span id="redCount">0</span> | Messi: <span id="yellowCount">0</span></h2>
+    
+    <img id="winnerImg" src="" style="display:none; width:200px; border: 5px solid gold; margin-top:10px;">
+
+    <audio id="spinAudio" src="spin.mp3"></audio>
+    <audio id="winAudio" src="win.mp3"></audio>
+
+    <script>
+        let red = 0, yellow = 0;
+
+        function spin() {
+            document.getElementById('spinAudio').play();
+            let rotation = Math.ceil(Math.random() * 1000) + 2000;
+            document.getElementById('wheel').style.transform = `rotate(${rotation}deg)`;
+            
+            setTimeout(() => {
+                document.getElementById('winAudio').play();
+                let finalDeg = rotation % 360;
+                let img = document.getElementById('winnerImg');
+                
+                if(finalDeg < 180) { 
+                    red++; 
+                    document.getElementById('redCount').innerText = red;
+                    img.src = 'ronaldo.jpg'; 
+                } else { 
+                    yellow++; 
+                    document.getElementById('yellowCount').innerText = yellow;
+                    img.src = 'messi.jpg'; 
+                }
+                
+                img.style.display = 'block';
+
+                setTimeout(() => {
+                    img.style.display = 'none';
+                    spin();
+                }, 10000); 
+            }, 5000); 
+        }
+        
+        spin();
+    </script>
+</body>
+</html>
